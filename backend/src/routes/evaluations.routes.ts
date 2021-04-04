@@ -19,22 +19,18 @@ evaluationsRouter.get('/', async (request, response) => {
 });
 
 evaluationsRouter.post('/', async (request, response) => {
-  try {
-    const { evaluator_id, start_date } = request.body;
+  const { evaluator_id, start_date } = request.body;
 
-    const formatStartDate = parseISO(start_date);
+  const formatStartDate = parseISO(start_date);
 
-    const createEvaluation = new CreateEvaluationService();
+  const createEvaluation = new CreateEvaluationService();
 
-    const evaluation = await createEvaluation.execute({
-      start_date: formatStartDate,
-      evaluator_id,
-    });
+  const evaluation = await createEvaluation.execute({
+    start_date: formatStartDate,
+    evaluator_id,
+  });
 
-    return response.json(evaluation);
-  } catch (err) {
-    return response.status(400).json({ error: err.message });
-  }
+  return response.json(evaluation);
 });
 
 export default evaluationsRouter;
