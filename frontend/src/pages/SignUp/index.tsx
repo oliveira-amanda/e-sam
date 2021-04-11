@@ -2,16 +2,27 @@ import React, { useCallback, useRef } from 'react';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
+import { Link, useHistory } from 'react-router-dom';
+import api from '../../services/api';
 import getValidationErrors from '../../utils/getValidationErrors';
+import { useToast } from '../../hooks/toast';
 
 import Logo from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
-import { Container, Content, Background } from './styles';
+import { Container, Content, AnimationContainer, Background } from './styles';
+
+interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 const SignUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const { addToast } = useToast();
+  const history = useHistory();
 
   const handleSubmit = useCallback(async (data: object) => {
     try {
@@ -30,33 +41,52 @@ const SignUp: React.FC = () => {
         abortEarly: false,
       });
 
-    } catch (err) {
-      const errors = getValidationErrors(err);
+      await api.post('/users', data);
 
-      formRef.current?.setErrors(errors);
+      history.push('/');
+
+      addToast({
+        type: 'success',
+        title: 'Cadastro realizado.',
+        description: 'Você já pode realizar seu login.',
+      })
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+
+        formRef.current?.setErrors(errors);
+      }
+
+      addToast({
+        type: 'error',
+        title: 'Erro no cadastro.',
+        description: 'Ocorreu um erro ao fazer cadastro, tente novamente.'
+      });
     }
-  }, []);
+  }, [addToast, history]);
 
   return (
     <Container>
       <Background />
 
       <Content>
-        <img src={Logo} alt='logo e-sam' />
+        <AnimationContainer>
+          <img src={Logo} alt='logo e-sam' />
 
-        <Form ref={formRef} onSubmit={handleSubmit}>
-          <h1>Cadastre-se</h1>
+          <Form ref={formRef} onSubmit={handleSubmit}>
+            <h1>Cadastre-se</h1>
 
-          <Input name='name' placeholder='Nome' />
-          <Input name='email' placeholder='E-mail' />
-          <Input name='password' placeholder='Senha' type='password' />
+            <Input name='name' placeholder='Nome' />
+            <Input name='email' placeholder='E-mail' />
+            <Input name='password' placeholder='Senha' type='password' />
 
-          <Button type='submit'>Cadastre-se</Button>
+            <Button type='submit'>Cadastre-se</Button>
 
-          <a href='login'>
-            Voltar para entrar
-          </a>
-        </Form>
+            <Link to='/'>
+              Voltar para entrar
+            </Link>
+          </Form>
+        </AnimationContainer>
       </Content>
     </Container>
   );
