@@ -1,4 +1,5 @@
 import { container } from 'tsyringe';
+import '@modules/users/providers';
 
 import IEvaluationsRepository from '@modules/evaluations/repositories/IEvaluationsRepository';
 import EvaluationsRepository from '@modules/evaluations/infra/typeorm/repositories/EvaluationsRepository';
