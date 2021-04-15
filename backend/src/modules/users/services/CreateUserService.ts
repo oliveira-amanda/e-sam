@@ -2,7 +2,7 @@ import { injectable, inject } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
 import IUsersRepository from '../repositories/IUserRepository';
-import IHashProvider from '../providers/HashProvider/models/IHashProviders';
+import IHashEvaluator from '../evaluator/HashEvaluator/models/IHashEvaluators';
 
 import User from '../infra/typeorm/entities/User';
 
@@ -18,8 +18,8 @@ class CreateUserService {
     @inject('UserRepository')
     private usersRepository: IUsersRepository,
 
-    @inject('hashProvider')
-    private hashProvider: IHashProvider,
+    @inject('hashEvaluator')
+    private hashEvaluator: IHashEvaluator,
   ){}
 
   public async execute({ name, email, password }: Request): Promise<User> {
@@ -29,7 +29,7 @@ class CreateUserService {
       throw new AppError('Email address already used.');
     }
 
-    const hashedPassword = await this.hashProvider.generateHash(password);
+    const hashedPassword = await this.hashEvaluator.generateHash(password);
 
     const user = await this.usersRepository.create({
       name,

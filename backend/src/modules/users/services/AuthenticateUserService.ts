@@ -3,7 +3,7 @@ import { sign } from 'jsonwebtoken';
 import authConfig from '@config/auth';
 import IUsersRepository from '../repositories/IUserRepository';
 import { injectable, inject } from 'tsyringe';
-import IHashProviders from '../providers/HashProvider/models/IHashProviders';
+import IHashEvaluator from '../evaluator/HashEvaluator/models/IHashEvaluators';
 
 import AppError from '@shared/errors/AppError';
 
@@ -25,8 +25,8 @@ class AuthenticateUserService {
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
 
-    @inject('HashProvider')
-    private hashProvider: IHashProviders,
+    @inject('HashEvaluator')
+    private hashEvaluator: IHashEvaluator,
   ){}
 
   public async execute({ email, password }: IRequest): Promise<IResponse> {
@@ -36,7 +36,7 @@ class AuthenticateUserService {
       throw new AppError('Incorrect e-mail/password combination.', 401);
     }
 
-    const passwordMatched = await this.hashProvider.compareHash(
+    const passwordMatched = await this.hashEvaluator.compareHash(
       password, 
       user.password
     );
