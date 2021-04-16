@@ -3,14 +3,21 @@ import CreateUserService from './CreateUserService';
 import FakeHashEvaluator from '../evaluator/HashEvaluator/fakes/FakeHashEvaluator';
 import AppError from '@shared/errors/AppError';
 
+let fakeUsersRepository: FakeUsersRepository;
+let fakeHashEvaluator: FakeHashEvaluator;
+let createUser: CreateUserService;
+
 describe('CreateUser', () => {
-  it('should be able to create a new user', async () => {
-    const fakeUsersRepository = new FakeUsersRepository();
-    const fakeHashEvaluator = new FakeHashEvaluator();
-    const createUser = new CreateUserService(
+  beforeEach(() => {
+    fakeUsersRepository = new FakeUsersRepository();
+    fakeHashEvaluator = new FakeHashEvaluator();
+    createUser = new CreateUserService(
       fakeUsersRepository,
       fakeHashEvaluator
     );
+  });
+
+  it('should be able to create a new user', async () => {
     const user = await createUser.execute({
 			name: 'João',
 			email: 'joao@teste.com',
